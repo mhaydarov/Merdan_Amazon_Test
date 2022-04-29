@@ -19,8 +19,17 @@ public class Basket extends BasePage{
     @FindBy(xpath = "//*[@class=\"sc-list-item-content\"]//*[@class=\"a-price-fraction\"]")
     public List<WebElement> basketItemsCostFraction;
 
-    @FindBy(xpath = "//*[@data-action=\"a-dropdown-button\"]")
+    @FindBy(xpath = "//*[@id=\"sc-subtotal-amount-activecart\"]//*[@class=\"a-price-whole\"]")
+    public WebElement subtotalItemsCostWhole;
+
+    @FindBy(xpath = "//*[@id=\"sc-subtotal-amount-activecart\"]//*[@class=\"a-price-fraction\"]")
+    public WebElement subtotalItemsCostFraction;
+
+    @FindBy(xpath = "//*[@data-action=\"a-dropdown-button\"]/parent::*")
     public WebElement quantityBtn;
+
+    @FindBy(id = "nav-cart-count")
+    public WebElement basketCount;
 
 
 }

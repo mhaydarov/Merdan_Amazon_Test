@@ -8,10 +8,9 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.junit.Assert;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,9 +25,11 @@ public class ProductSearch {
     Product product = new Product();
 
     String itemText;
+    int basketItemNumber;
 
     Map<String,Double> basketMap = new HashMap<>();
 
+    WebDriverWait wait = new WebDriverWait (Driver.get(), 30);
 
     @Given("the user is on the login page")
     public void the_user_is_on_the_login_page() {
@@ -109,6 +110,7 @@ public class ProductSearch {
 
         Utils.waitFor(2);
 
+        basketItemNumber = Integer.parseInt(basket.basketCount.getText());
 
     }
 
@@ -116,6 +118,7 @@ public class ProductSearch {
     public void user_sees_basket_containing_the_product() {
 
         int count=1;
+        Utils.waitFor(2);
 
         List<WebElement> basketItems = basket.basketItems;
 
@@ -123,47 +126,18 @@ public class ProductSearch {
 
         List<WebElement> basketItemsCostsFraction = basket.basketItemsCostFraction;
 
-        List<String> basketItemsList = new ArrayList<>();
-        List<String> basketItemsCostsFull = new ArrayList<>();
-
         System.out.println("Basket Items:");
 
         Utils.waitFor(2);
 
-//        for(int i=0; i<basketItems.size(); i++){
-//            basketItemsList.add(basketItems.get(i).getText());
-//            basketItemsCostsFull.add(basketItemsCostsWhole.get(i).getText()+"."+basketItemsCostsFraction.get(i).getText());
-//            System.out.println("Item "+count+" - "+basketItemsList.get(i)+" = £"+basketItemsCostsFull.get(i));
-//            count++;
-//        }
+        System.out.println("basketItemNumber = " + basketItemNumber);
 
-        for (int i = 0; i < basketItems.size(); i++) {
+        for (int i = 0; i < basketItemNumber; i++) {
             basketMap.put(basketItems.get(i).getText(), Double.valueOf(basketItemsCostsWhole.get(i).getText().replace(",","") +"."+ basketItemsCostsFraction.get(i).getText()));
         }
 
-
-
-
-        Boolean itemListed=false;
-
-        if(basketMap.containsKey(itemText)){
-            itemListed = true;
-        }
-
-//        for (WebElement el: basketItems) {
-//            if(el.getText().equals(itemText)){
-//                itemListed = true;
-//                break;
-//            }
-//        }
-
-//        Assert.assertTrue(itemListed);
         Assert.assertTrue(basketMap.containsKey(itemText));
 
-
-//        for (int i = 0; i < basketItems.size(); i++) {
-//            basketMap.put(basketItemsList.get(i), Double.valueOf(basketItemsCostsFull.get(i).replace(",","")));
-//        }
 
         Utils.waitFor(2);
 
@@ -172,16 +146,33 @@ public class ProductSearch {
 
 
     @When("user increases product quantity by {int} the subtotal changes accordingly")
-    public void user_increases_product_quantity_by_the_subtotal_changes_accordingly(int quantity) {
-
-        basketMap.toString();
-        System.out.println("basketMap.get(itemText) = " + basketMap.get(itemText));
-        basket.quantityBtn.click();
-
-//        WebElement quantityNumber = Driver.get().findElement(By.cssSelector("[id=quantity_3]"));
-//        quantityNumber.click();
+    public void user_increases_product_quantity_by_the_subtotal_changes_accordingly(int additional) {
 
 
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@data-action=\"a-dropdown-button\"]/parent::*"))).click();
+
+        JavascriptExecutor jse = (JavascriptExecutor)Driver.get();
+        jse.executeScript("arguments[0].click;", basket.quantityBtn);
+
+        WebElement quantitySelect = Driver.get().findElement(By.cssSelector("[aria-labelledby=\"quantity_"+(1+additional)+"\"]"));
+        quantitySelect.click();
+
+        Utils.waitFor(5);
+
+        basketItemNumber = Integer.parseInt(basket.basketCount.getText());
+
+        Assert.assertEquals(basketItemNumber, 1+additional);
+
+        double itemValue = basketMap.get(itemText);
+        String expectedSum = String.valueOf(itemValue*(1+additional));
+
+        int actualWholePrice = Integer.parseInt(basket.subtotalItemsCostWhole.getText());
+        int actualFractionPrice = Integer.parseInt(basket.subtotalItemsCostFraction.getText());
+        String actualPrice = actualWholePrice+"."+actualFractionPrice;
+
+        double actualSum = itemValue*(1+additional);
+
+        Assert.assertEquals(expectedSum,actualSum);
 
     }
 
