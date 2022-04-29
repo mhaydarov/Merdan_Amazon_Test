@@ -170,7 +170,7 @@ public class ProductSearch {
         int actualFractionPrice = Integer.parseInt(basket.subtotalItemsCostFraction.getText());
         String actualPrice = actualWholePrice+"."+actualFractionPrice;
 
-        double actualSum = itemValue*(1+additional);
+        String actualSum = String.valueOf(itemValue*(1+additional));
 
         Assert.assertEquals(expectedSum,actualSum);
 
