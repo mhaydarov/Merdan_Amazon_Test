@@ -11,7 +11,7 @@ public abstract class BasePage {
         PageFactory.initElements(Driver.get(), this);
     }
 
-    @FindBy(css = "[id=nav-link-accountList]")
+    @FindBy (css = "[id=nav-link-accountList]")
     public WebElement loginNavLink;
 
 }
