@@ -12,6 +12,7 @@ import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -29,7 +30,7 @@ public class ProductSearch {
 
     Map<String,Double> basketMap = new HashMap<>();
 
-    WebDriverWait wait = new WebDriverWait (Driver.get(), 30);
+    WebDriverWait wait = new WebDriverWait (Driver.get(), Duration.ofSeconds(2));
 
     @Given("the user is on the login page")
     public void the_user_is_on_the_login_page() {
